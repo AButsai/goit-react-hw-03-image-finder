@@ -5,25 +5,25 @@ import s from './Searchbar.module.css';
 
 class Searchbar extends Component {
   state = {
-    tag: '',
+    query: '',
   };
 
   handleChange = e => {
     const { value } = e.currentTarget;
 
-    this.setState({ tag: value.toLowerCase() });
+    this.setState({ query: value.toLowerCase() });
   };
 
   handleSubmit = e => {
     e.preventDefault();
 
-    if (this.state.tag.trim() === '') {
+    if (this.state.query.trim() === '') {
       toast('Enter image name');
       return;
     }
 
-    this.props.onSubmit(this.state.tag);
-    this.setState({ tag: '' });
+    this.props.onSubmit(this.state.query);
+    this.setState({ query: '' });
   };
 
   render() {
@@ -40,7 +40,7 @@ class Searchbar extends Component {
             autocomplete="off"
             autofocus
             placeholder="Search images and photos"
-            value={this.state.tag}
+            value={this.state.query}
             onChange={this.handleChange}
           />
         </form>

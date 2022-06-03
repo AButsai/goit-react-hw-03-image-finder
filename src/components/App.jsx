@@ -1,65 +1,111 @@
 import React, { Component } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
-import api from '../services/images-api.js';
+import api from '../services/imagesApi.js';
 import Searchbar from './Searchbar';
 import ImageGallery from './ImageGallery';
+import Button from './Button';
+import Loader from './Loader';
 
 import s from './App.module.css';
+
+const Status = {
+  IDLE: 'idle',
+  PENDING: 'pending',
+  RESOLVED: 'resolved',
+  REJECTED: 'rejected',
+};
 
 class App extends Component {
   state = {
     dataImages: [],
     imagesTag: '',
     page: 1,
+    status: Status.IDLE,
+    errors: null,
   };
 
   componentDidUpdate(prevProps, prevState) {
     const { dataImages, imagesTag, page } = this.state;
 
     if (prevState.imagesTag !== imagesTag || prevState.page !== page) {
+      this.setState({ status: Status.PENDING });
+
       api
         .fetchImages(imagesTag, page)
-        .then(response => {
-          if (response.data.total !== 0) {
-            return response.data;
-          }
-          return Promise.reject(
-            new Error(`Нет картинок с названием ${imagesTag}`)
-          );
-        })
-        .then(data => this.setState({ dataImages: [...dataImages, data] }))
+        .then(data =>
+          this.setState({
+            dataImages: [...dataImages, data],
+            status: Status.RESOLVED,
+          })
+        )
         .catch(error => {
-          toast.error(error.message);
+          this.setState({ errors: error, status: Status.REJECTED });
         });
     }
   }
 
   handleSubmitForm = imagesTag => {
-    this.setState({ imagesTag, page: 1, dataImages: [], error: null });
+    this.setState({ imagesTag, page: 1, dataImages: [], errors: null });
   };
 
-  handleButtonClick = () => {
+  handleButtonClick = e => {
+    e.preventDefault();
     this.setState(prevState => {
       return { page: prevState.page + 1 };
     });
   };
 
   render() {
-    const { dataImages } = this.state;
+    const { dataImages, status, errors } = this.state;
+    const searchBar = <Searchbar onSubmit={this.handleSubmitForm} />;
+    const toastContainer = <ToastContainer autoClose={1500} />;
 
-    return (
-      <div className={s.App}>
-        <Searchbar onSubmit={this.handleSubmitForm} />
-        {dataImages.length !== 0 && (
-          <ImageGallery
-            images={dataImages}
-            onClickButton={this.handleButtonClick}
-          />
-        )}
+    if (status === 'idle') {
+      return (
+        <div className={s.App}>
+          {searchBar}
+          {toastContainer}
+        </div>
+      );
+    }
 
-        <ToastContainer autoClose={1500} />
-      </div>
-    );
+    if (status === 'pending') {
+      return (
+        <div className={s.App}>
+          {searchBar}
+          {toastContainer}
+          {dataImages.length !== 0 && <ImageGallery images={dataImages} />}
+          <Loader />
+        </div>
+      );
+    }
+
+    if (status === 'resolved') {
+      return (
+        <div className={s.App}>
+          {searchBar}
+          {toastContainer}
+          <ImageGallery images={dataImages}>
+            <Button onClick={this.handleButtonClick} />
+          </ImageGallery>
+        </div>
+      );
+    }
+
+    if (status === 'rejected') {
+      return (
+        <div className={s.App}>
+          {searchBar}
+          {toastContainer}
+          {errors && (
+            <p className={s.ErrorTitle}>
+              Нет картинок с названием <span>{errors.message}</span>, поробуйте
+              ввести другое название!
+            </p>
+          )}
+        </div>
+      );
+    }
   }
 }
 
