@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { ToastContainer } from 'react-toastify';
-import api from '../services/imagesApi.js';
-import Searchbar from './Searchbar';
-import ImageGallery from './ImageGallery';
-import Button from './Button';
-import Loader from './Loader';
+import api from '../../services/imagesApi.js';
+import Searchbar from '../Searchbar';
+import ImageGallery from '../ImageGallery';
+import Button from '../Button';
+import Loader from '../Loader';
 
 import s from './App.module.css';
 
@@ -60,52 +60,48 @@ class App extends Component {
     const searchBar = <Searchbar onSubmit={this.handleSubmitForm} />;
     const toastContainer = <ToastContainer autoClose={1500} />;
 
-    if (status === 'idle') {
-      return (
-        <div className={s.App}>
-          {searchBar}
-          {toastContainer}
-        </div>
-      );
-    }
+    return (
+      <>
+        {status === 'idle' && (
+          <div className={s.App}>
+            {searchBar}
+            {toastContainer}
+          </div>
+        )}
 
-    if (status === 'pending') {
-      return (
-        <div className={s.App}>
-          {searchBar}
-          {toastContainer}
-          {dataImages.length !== 0 && <ImageGallery images={dataImages} />}
-          <Loader />
-        </div>
-      );
-    }
+        {status === 'pending' && (
+          <div className={s.App}>
+            {searchBar}
+            {toastContainer}
+            {dataImages.length !== 0 && <ImageGallery images={dataImages} />}
+            <Loader />
+          </div>
+        )}
 
-    if (status === 'resolved') {
-      return (
-        <div className={s.App}>
-          {searchBar}
-          {toastContainer}
-          <ImageGallery images={dataImages}>
-            <Button onClick={this.handleButtonClick} />
-          </ImageGallery>
-        </div>
-      );
-    }
+        {status === 'resolved' && (
+          <div className={s.App}>
+            {searchBar}
+            {toastContainer}
+            <ImageGallery images={dataImages}>
+              <Button onClick={this.handleButtonClick} />
+            </ImageGallery>
+          </div>
+        )}
 
-    if (status === 'rejected') {
-      return (
-        <div className={s.App}>
-          {searchBar}
-          {toastContainer}
-          {errors && (
-            <p className={s.ErrorTitle}>
-              Нет картинок с названием <span>{errors.message}</span>, поробуйте
-              ввести другое название!
-            </p>
-          )}
-        </div>
-      );
-    }
+        {status === 'rejected' && (
+          <div className={s.App}>
+            {searchBar}
+            {toastContainer}
+            {errors && (
+              <p className={s.ErrorTitle}>
+                Нет картинок с названием <span>{errors.message}</span>,
+                поробуйте ввести другое название!
+              </p>
+            )}
+          </div>
+        )}
+      </>
+    );
   }
 }
 
