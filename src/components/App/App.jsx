@@ -57,22 +57,20 @@ class App extends Component {
 
   render() {
     const { dataImages, status, errors } = this.state;
-    const searchBar = <Searchbar onSubmit={this.handleSubmitForm} />;
-    const toastContainer = <ToastContainer autoClose={1500} />;
 
     return (
       <>
         {status === 'idle' && (
           <div className={s.App}>
-            {searchBar}
-            {toastContainer}
+            <Searchbar onSubmit={this.handleSubmitForm} />
+            <ToastContainer autoClose={1500} />
           </div>
         )}
 
         {status === 'pending' && (
           <div className={s.App}>
-            {searchBar}
-            {toastContainer}
+            <Searchbar onSubmit={this.handleSubmitForm} />
+            <ToastContainer autoClose={1500} />
             {dataImages.length !== 0 && <ImageGallery images={dataImages} />}
             <Loader />
           </div>
@@ -80,8 +78,8 @@ class App extends Component {
 
         {status === 'resolved' && (
           <div className={s.App}>
-            {searchBar}
-            {toastContainer}
+            <Searchbar onSubmit={this.handleSubmitForm} />
+            <ToastContainer autoClose={1500} />
             <ImageGallery images={dataImages}>
               <Button onClick={this.handleButtonClick} />
             </ImageGallery>
@@ -90,8 +88,8 @@ class App extends Component {
 
         {status === 'rejected' && (
           <div className={s.App}>
-            {searchBar}
-            {toastContainer}
+            <Searchbar onSubmit={this.handleSubmitForm} />
+            <ToastContainer autoClose={1500} />
             {errors && (
               <p className={s.ErrorTitle}>
                 Нет картинок с названием <span>{errors.message}</span>,
